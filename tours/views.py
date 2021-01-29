@@ -1,6 +1,6 @@
 import random
 
-from django.http import HttpResponseNotFound, HttpResponseServerError
+from django.http import HttpResponseNotFound, HttpResponseServerError, Http404
 from django.shortcuts import render
 
 from .data import departures, tours
@@ -45,7 +45,7 @@ def tour_view(request, id):
     try:
         tour = tours[id]
     except:
-        raise HttpResponseNotFound
+        raise Http404
     depart = departures[tour['departure']]
     return render(request, 'tour.html', {
         'id': id,
