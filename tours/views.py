@@ -1,4 +1,4 @@
-from random import randint
+import random
 
 from django.http import HttpResponseNotFound, HttpResponseServerError
 from django.shortcuts import render
@@ -9,66 +9,50 @@ from .data import departures, tours
 def main_view(request):
     random_tours = []
     while len(random_tours) < 6:
-        rand = randint(1, len(tours))
-        for key, value in tours.items():
-            tour = value.copy()
-            tour['id'] = key
-            if key == rand and tour not in random_tours:
+        rand = random.randint(1, len(tours))
+        for tour_id, tour in tours.items():
+            tour = tour.copy()
+            tour['id'] = tour_id
+            if tour_id == rand and tour not in random_tours:
                 random_tours.append(tour)
 
-    return render(request, 'index.html',
-                  {'departures': departures,
-                   'tours': random_tours,
-                   })
+    return render(request, 'index.html', {
+        'departures': departures,
+        'tours': random_tours,
+    })
 
 
 def departure_view(request, departure):
     depart_tours = []
-    for key, value in tours.items():
-        if value['departure'] == departure:
-            tour = value.copy()
-            tour['id'] = key
+    for tour_id, tour in tours.items():
+        if tour['departure'] == departure:
+            tour = tour.copy()
+            tour['id'] = tour_id
             depart_tours.append(tour)
 
-    return render(request, 'departure.html',
-                  {'departures': departures,
-                   'tours': depart_tours,
-                   'departure': departures[departure],
-                   'word': tour_declension(len(depart_tours)),
-                   'min_price': min_max(depart_tours, 'price')[0],
-                   'max_price': min_max(depart_tours, 'price')[1],
-                   'min_nights': min_max(depart_tours, 'nights')[0],
-                   'max_nights': min_max(depart_tours, 'nights')[1],
-                   })
+    return render(request, 'departure.html', {
+        'departures': departures,
+        'tours': depart_tours,
+        'departure': departures[departure],
+        'min_price': min(tour['price'] for tour in depart_tours),
+        'max_price': max(tour['price'] for tour in depart_tours),
+        'min_nights': min(tour['nights'] for tour in depart_tours),
+        'max_nights': max(tour['nights'] for tour in depart_tours),
+    })
 
 
 def tour_view(request, id):
-    tour = tours[id]
-    star = int(tour['stars']) * '★'
+    try:
+        tour = tours[id]
+    except:
+        raise HttpResponseNotFound
     depart = departures[tour['departure']]
-    return render(request, 'tour.html',
-                  {'id': id,
-                   'tour': tour,
-                   'depart': depart,
-                   'departures': departures,
-                   'stars': star,
-                   })
-
-
-def tour_declension(num):
-    n = int(str(num)[-1])
-    m = int(str(num // 10)[-1])
-    if n == 1 and m != 1:
-        return 'тур'
-    elif 1 < n < 5 and m != 1:
-        return 'тура'
-    else:
-        return 'туров'
-
-
-def min_max(data, key):
-    v_list = [item[key] for item in data]
-    return min(v_list), max(v_list)
+    return render(request, 'tour.html', {
+        'id': id,
+        'tour': tour,
+        'depart': depart,
+        'departures': departures,
+    })
 
 
 def custom_handler404(request, exception):

@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 {% block main %}
+{% load my_filters %}
 <main class="container mt-3">
   <h1 class="display-5 mt-4">Летим {{ departure }}</h1>
-  <p class="mb-4">Найдено {{ tours|length }} {{ word }}, от {{ min_price }} до {{ max_price }} и от {{ min_nights }}
-    ночей до {{ max_nights }} ночей</p>
+  <p class="mb-4">Найдено {% tour_declension tours|length %}, от {{ min_price }} до {{ max_price }} и от
+    {{ min_nights }} до {{ max_nights }} ночей</p>
   <!-- CARDS -->
   <div class="row mt-5">
     {% for tour in tours %}
@@ -23,3 +24,4 @@
   </div>
 </main>
 {% endblock %}
+
