@@ -1,4 +1,5 @@
 from django import template
+from django.utils.safestring import mark_safe
 
 register = template.Library()
 
@@ -18,5 +19,5 @@ def tour_declension(num):
 
 @register.filter()
 def render_stars(num):
-    stars = int(num) * '☆'
-    return stars
+    stars = int(num) * '&#9734;'
+    return mark_safe(stars)
