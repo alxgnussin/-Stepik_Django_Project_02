@@ -45,7 +45,7 @@ def tour_view(request, id):
     try:
         tour = tours[id]
     except:
-        raise Http404
+        raise Http404()
     depart = departures[tour['departure']]
     return render(request, 'tour.html', {
         'id': id,
